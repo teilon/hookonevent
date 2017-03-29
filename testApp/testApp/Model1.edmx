@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="dbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'db.dbo.vDumps' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vDumps">
+          <Key>
+            <PropertyRef Name="TransportId" />
+            <PropertyRef Name="TypeId" />
+            <PropertyRef Name="ModelId" />
+          </Key>
+          <Property Name="TransportId" Type="varchar" MaxLength="32" Nullable="false" />
+          <Property Name="ParkNumber" Type="varchar" MaxLength="255" />
+          <Property Name="TypeId" Type="varchar" MaxLength="32" Nullable="false" />
+          <Property Name="ModelId" Type="varchar" MaxLength="32" Nullable="false" />
+          <Property Name="LastLongitude" Type="float" />
+          <Property Name="LastLatitude" Type="float" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'db.dbo.vZones' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vZones">
+          <Key>
+            <PropertyRef Name="ZoneId" />
+          </Key>
+          <Property Name="ZoneId" Type="varchar" MaxLength="32" Nullable="false" />
+          <Property Name="ZoneName" Type="varchar" MaxLength="40" />
+          <Property Name="ZoneTypeId" Type="smallint" />
+          <Property Name="x" Type="float" />
+          <Property Name="y" Type="float" />
+          <Property Name="z" Type="float" />
+        </EntityType>
+        <EntityContainer Name="dbModelStoreContainer">
+          <EntitySet Name="vDumps" EntityType="Self.vDumps" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vDumps].[TransportId] AS [TransportId], 
+    [vDumps].[ParkNumber] AS [ParkNumber], 
+    [vDumps].[TypeId] AS [TypeId], 
+    [vDumps].[ModelId] AS [ModelId], 
+    [vDumps].[LastLongitude] AS [LastLongitude], 
+    [vDumps].[LastLatitude] AS [LastLatitude]
+    FROM [dbo].[vDumps] AS [vDumps]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vZones" EntityType="Self.vZones" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vZones].[ZoneId] AS [ZoneId], 
+    [vZones].[ZoneName] AS [ZoneName], 
+    [vZones].[ZoneTypeId] AS [ZoneTypeId], 
+    [vZones].[x] AS [x], 
+    [vZones].[y] AS [y], 
+    [vZones].[z] AS [z]
+    FROM [dbo].[vZones] AS [vZones]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="dbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="vZones">
+          <Key>
+            <PropertyRef Name="ZoneId" />
+          </Key>
+          <Property Name="ZoneId" Type="String" MaxLength="32" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ZoneName" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="ZoneTypeId" Type="Int16" />
+          <Property Name="x" Type="Double" />
+          <Property Name="y" Type="Double" />
+          <Property Name="z" Type="Double" />
+        </EntityType>
+        <EntityContainer Name="dbEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="vZones" EntityType="Self.vZones" />
+          <EntitySet Name="vDumps" EntityType="dbModel.vDumps" />
+        </EntityContainer>
+        <EntityType Name="vDumps">
+          <Key>
+            <PropertyRef Name="TransportId" />
+            <PropertyRef Name="TypeId" />
+            <PropertyRef Name="ModelId" />
+          </Key>
+          <Property Name="TransportId" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="ParkNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="TypeId" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="ModelId" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="LastLongitude" Type="Double" />
+          <Property Name="LastLatitude" Type="Double" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="dbModelStoreContainer" CdmEntityContainer="dbEntities">
+          <EntitySetMapping Name="vZones">
+            <EntityTypeMapping TypeName="dbModel.vZones">
+              <MappingFragment StoreEntitySet="vZones">
+                <ScalarProperty Name="ZoneId" ColumnName="ZoneId" />
+                <ScalarProperty Name="ZoneName" ColumnName="ZoneName" />
+                <ScalarProperty Name="ZoneTypeId" ColumnName="ZoneTypeId" />
+                <ScalarProperty Name="x" ColumnName="x" />
+                <ScalarProperty Name="y" ColumnName="y" />
+                <ScalarProperty Name="z" ColumnName="z" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vDumps">
+            <EntityTypeMapping TypeName="dbModel.vDumps">
+              <MappingFragment StoreEntitySet="vDumps">
+                <ScalarProperty Name="LastLatitude" ColumnName="LastLatitude" />
+                <ScalarProperty Name="LastLongitude" ColumnName="LastLongitude" />
+                <ScalarProperty Name="ModelId" ColumnName="ModelId" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+                <ScalarProperty Name="ParkNumber" ColumnName="ParkNumber" />
+                <ScalarProperty Name="TransportId" ColumnName="TransportId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

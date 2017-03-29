@@ -1,0 +1,12 @@
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\testApp.exe.config
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\testApp.exe
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\testApp.pdb
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\calcevent.dll
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\calcevent.pdb
+G:\temp\temp32aternative\testApp\testApp\obj\Debug\testApp.csprojResolveAssemblyReference.cache
+G:\temp\temp32aternative\testApp\testApp\obj\Debug\testApp.exe
+G:\temp\temp32aternative\testApp\testApp\obj\Debug\testApp.pdb
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\EntityFramework.dll
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\EntityFramework.xml
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\EntityFramework.SqlServer.dll
+G:\temp\temp32aternative\testApp\testApp\bin\Debug\EntityFramework.SqlServer.xml
