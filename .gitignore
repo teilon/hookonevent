@@ -1,0 +1,8 @@
+
+# debug files calcevent
+calcevent/bin
+calcevent/obj
+
+# debug files testApp
+testApp/testApp/bin
+testApp/testApp/obj
