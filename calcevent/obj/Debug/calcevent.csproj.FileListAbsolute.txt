@@ -1,5 +1,0 @@
-G:\temp\temp32aternative\calcevent\bin\Debug\calcevent.dll
-G:\temp\temp32aternative\calcevent\bin\Debug\calcevent.pdb
-G:\temp\temp32aternative\calcevent\obj\Debug\calcevent.csprojResolveAssemblyReference.cache
-G:\temp\temp32aternative\calcevent\obj\Debug\calcevent.dll
-G:\temp\temp32aternative\calcevent\obj\Debug\calcevent.pdb
