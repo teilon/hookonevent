@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="dbMethodts\GetFromDB.cs" />
-    <Compile Include="GetFromDB_Transports.cs" />
+    <Compile Include="dbMethodts\GetFromDB_Zones.cs" />
+    <Compile Include="dbMethodts\GetFromDB_Transports.cs" />
     <Compile Include="Model1.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
