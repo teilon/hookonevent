@@ -1,4 +1,5 @@
 ﻿using calcevent.dump;
+using calcevent.progress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,6 @@ namespace testApp
         }
         public static Dictionary<string, Dictionary<string, Dictionary<string, string>>> TransportsDict()
         {
-            Dictionary<string, string> basedata = new Dictionary<string, string>();
-            Dictionary<string, string> curdata = new Dictionary<string, string>();
             Dictionary<string, Dictionary<string, Dictionary<string, string>>> result = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
 
             using (var db = new dbEntities())
@@ -58,6 +57,27 @@ namespace testApp
                 }
             }
             return result;
+        }
+        public static List<TransportItem> ToTransportProgress()
+        {
+            List<TransportItem> _trp = new List<TransportItem>();
+
+            using (var db = new dbEntities())
+            {
+                foreach (var t in db.vDumps)
+                {
+                    TransportItem _ti = new TransportItem(t.TransportId);
+                    _ti.ParkNumber = t.ParkNumber;
+                    _ti.ModelId = t.ModelId;
+                    _ti.TypeId = t.TypeId;
+                    _ti.CurrentLatitude = (double)t.LastLatitude;
+                    _ti.CurrentLongitude = (double)t.LastLongitude;
+
+                    _trp.Add(_ti);
+
+                }
+            }
+            return _trp;
         }
     }
 }

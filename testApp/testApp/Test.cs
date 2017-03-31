@@ -11,58 +11,61 @@ namespace testApp
 {
     class Test
     {
-        GeozoneList _gzl;
-        TransportList _tl;
-        TransportDict _td;
-        public GeozoneList ZoneList { get { return _gzl; } }
-        public TransportList TransportList { get { return _tl; } }
-        public TransportDict TransportDict { get { return _td; } }
+        TransportProgress _trp;
+        public TransportProgress TransportProgress { get { return _trp; } }
+        ZoneProgress _znp;
+        public ZoneProgress ZoneProgress { get { return _znp; } }
 
         public Test()
         {
-            //addZoneList(GetFromDB.Zones());
-            //addTransportList(GetFromDB.Transports());
-            addTransportDict(GetFromDB.TransportsDict());
+            MessageRecipient recipient = new MessageRecipient();
+            recipient.addTransportList(GetFromDB.ToTransportProgress());
+            _trp = recipient.TransportProgress;
+            recipient.addZoneList(GetFromDB.ToZoneProgress());
+            _znp = recipient.ZoneProgress;
         }
-        public void addZoneList(GeozoneList gzl)
+        public void Start()
         {
-            _gzl = gzl;
+            
+            TestTransports();
+            
+            TestZones();
+            
+            TestStates();
+
+            TransportProgress["804"].ToMove();
+            TransportProgress["806"].ToMove();
+            TransportProgress["809"].ToMove();
+            TransportProgress["804"].ToMove();
+            TransportProgress["10"].ToMove();
+            TransportProgress["806"].ToStop();
+            TransportProgress["804"].ToStop();
+
+            TestStates();
         }
-        public void addTransportList(TransportList tl)
+        void TestTransports()
         {
-            _tl = tl;
-        }
-        public void addTransportDict(Dictionary<string, Dictionary<string, Dictionary<string, string>>> tl)
-        {
-            _td = new TransportDict();
-            _td.Items = tl;
-        }
-        public void TestLists()
-        {
-            foreach (var z in ZoneList.Zones)
+            System.Diagnostics.Debug.WriteLine("\nTransports:");
+            foreach (var t in TransportProgress.Items)
             {
-                Console.WriteLine("id:{0}, name:{1}, type:{2}, count of point:{3}", z.Id, z.DisplayName, z.Type, z.Points.Count);
-            }
-            Console.WriteLine("\n");
-            foreach (var t in TransportList.Transports)
-            {
-                Console.WriteLine("id:{0}, park number:{1}, type id:{2}, model id:{3}, last longitude:{4}, last latitude:{5}", t.Id, t.ParkNumber, t.TypeId, t.ModelId, t.LastLongitude, t.LastLatitude);
+                System.Diagnostics.Debug.WriteLine("TransportId:{0}, ParkNumber:{1}, ModelId:{2}, TypeId:{3}, LastLatitude:{4}, LastLongitude:{5}, LastTimeStamp:{6}, LastZone:{7}", 
+                    t.TransportId, t.ParkNumber, t.ModelId, t.TypeId, t.CurrentLatitude, t.CurrentLongitude, t.CurrentTimeStamp, t.CurrentZone);                
             }
         }
-        public void TestDict()
+        void TestZones()
         {
-            foreach(var i in TransportDict.Items)
+            System.Diagnostics.Debug.WriteLine("\nZones:");
+            foreach (var z in ZoneProgress.Items)
             {
-                Console.WriteLine("device: {0}", i.Key);
-                Dictionary<string, Dictionary<string, string>> _item = i.Value;
-                foreach (var b in _item.Keys)
-                {
-                    if (b == "base")
-                        Console.Write("{0}; {1}; {2}; {3};", _item[b]["id"], _item[b]["park"], _item[b]["type"], _item[b]["model"]);
-                    if (b == "curdata")
-                        Console.WriteLine("{0}; {1};", _item[b]["lat"], _item[b]["lon"]);
-                }
+                System.Diagnostics.Debug.WriteLine("ZoneId:{0}, DisplayName:{1}, Type:{2}",
+                    z.Id, z.DisplayName, z.Type);
             }
+        }
+        void TestStates()
+        {
+            System.Diagnostics.Debug.WriteLine("\nTransport states:");
+            string output = TransportProgress.GetCurrentStates();
+            System.Diagnostics.Debug.WriteLine(output);
         }
     }
 }

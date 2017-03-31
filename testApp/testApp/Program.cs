@@ -11,17 +11,8 @@ namespace testApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(TestEM.GetCurrentDate());
-
             Test test = new Test();
-            //test.TestLists();
-            test.TestDict();
-
-
-
-            //delay
-            Console.WriteLine("\nend.");
-            Console.ReadLine();
+            test.Start();
         }
         
     }
