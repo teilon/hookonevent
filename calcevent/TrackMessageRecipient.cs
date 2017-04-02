@@ -28,6 +28,7 @@ namespace calcevent
         {
             _znp = new ZoneProgress(znp);
         }
+
         public void AddMessage(string input)
         {
             string result = string.Empty;

@@ -11,10 +11,7 @@ namespace calcevent.progress
     {
         List<TransportItem> _items;
         public List<TransportItem> Items { get { return _items; } }
-        //public TransportItem this[string transportId] { get { return _items.Where(x => x.TransportId == transportId).FirstOrDefault(); } }
-
-        //
-
+        
         Dictionary<string, StateInterface> _transportStates = new Dictionary<string, StateInterface>();
         public StateInterface this[string transportId] { get { return _transportStates[transportId]; } }
 
@@ -49,19 +46,52 @@ namespace calcevent.progress
                 return;
             TransportItem _ti = _items.Where(x => x.TransportId == deviceId).FirstOrDefault();
             _ti.CurrentTimeStamp = timestamp;
-            ChangeStatusCode(statuscode);
+            _ti.CurrentOreType = oreType;
+            //ChangeStatusCode();
         }
-        public void AddMessage(string deviceId, string timestamp, string statuscode, double latitude, double longitude, double speedKPH, double heading, double altitude)
+        public void AddMessage(string deviceId, string timestamp, string statuscode, 
+            double latitude, double longitude, double speedKPH, double heading, double altitude)
         {
             if (Items.Select(x => x.TransportId = deviceId).FirstOrDefault() == null)
                 return;
             TransportItem _ti = _items.Where(x => x.TransportId == deviceId).FirstOrDefault();
             _ti.CurrentTimeStamp = timestamp;
-            ChangeStatusCode(statuscode);
+            _ti.CurrentLatitude = latitude;
+            _ti.CurrentLongitude = longitude;
+            ChangeStatusCode(deviceId);
         }
-        void ChangeStatusCode(string statuscode)
+        void ChangeStatusCode(string deviceId)
         {
-
+            if (checkLoad())
+            {
+                (_transportStates[deviceId] as ILoaderState).OnLoad();
+                
+            }
+            if (checkUnload())
+            {
+                //unload
+            }
+        }
+        public TransportItem GetTransportItem(string transportId)
+        {
+            return _items.Where(x => x.TransportId == transportId).FirstOrDefault();
+        }
+        void SetLoadKey(string transportid, string _zoneid, string _excavatorid, string _oretypeid, double _oreweight)
+        {
+            TransportEventKey _key = GetTransportItem(transportid).LastKeyEvent;
+            _key.EventId = "1011";
+            _key.ZoneId = _zoneid;
+            _key.ExcavatorId = _excavatorid;
+            _key.OreTypeId = _oretypeid;
+            _key.OreWeight = _oreweight;
+        }
+        bool checkLoad()
+        {            
+            return true;
+        }
+        bool checkUnload()
+        {
+            return true;
         }
 
     }

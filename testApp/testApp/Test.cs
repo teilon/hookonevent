@@ -40,6 +40,8 @@ namespace testApp
             TransportProgress["10"].ToMove();
             TransportProgress["806"].ToStop();
             TransportProgress["804"].ToStop();
+            TransportProgress["806"].ToMove();
+            TransportProgress["804"].OnLoadingZone();
 
             TestStates();
         }
