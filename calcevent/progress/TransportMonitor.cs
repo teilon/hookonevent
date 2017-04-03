@@ -58,10 +58,20 @@ namespace calcevent.progress
 
             Dictionary<string, string> checkZone = _zones.GetIntersect(location);
             if (checkZone["isIntersect"] == "no")
+            {
+                if (transport.CurrentSpeed == 0)
+                {
+                    (transport.CurrentState as IOutagerState).ToStop();
+                }
+                else
+                {
+                    (transport.CurrentState as IMoverState).ToMove();
+                }
                 return;
+            }                
             if(checkZone["type"] == "1")
             {
-                if(checkZone["zonelocation"] == "target")
+                if(checkZone["zonelocation"] == "target" && transport.CurrentSpeed == 0)
                 {                    
                     (transport.CurrentState as ILoaderState).OnLoad();
                 }
