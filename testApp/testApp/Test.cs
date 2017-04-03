@@ -33,15 +33,15 @@ namespace testApp
             
             TestStates();
 
-            TransportProgress["804"].ToMove();
-            TransportProgress["806"].ToMove();
-            TransportProgress["809"].ToMove();
-            TransportProgress["804"].ToMove();
-            TransportProgress["10"].ToMove();
-            TransportProgress["806"].ToStop();
-            TransportProgress["804"].ToStop();
-            TransportProgress["806"].ToMove();
-            TransportProgress["804"].OnLoadingZone();
+            TransportProgress["804"].CurrentState.ToMove();
+            TransportProgress["806"].CurrentState.ToMove();
+            TransportProgress["809"].CurrentState.ToMove();
+            TransportProgress["804"].CurrentState.ToMove();
+            TransportProgress["10"].CurrentState.ToMove();
+            TransportProgress["806"].CurrentState.ToStop();
+            TransportProgress["804"].CurrentState.ToStop();
+            TransportProgress["806"].CurrentState.ToMove();
+            
 
             TestStates();
         }
@@ -50,8 +50,8 @@ namespace testApp
             System.Diagnostics.Debug.WriteLine("\nTransports:");
             foreach (var t in TransportProgress.Items)
             {
-                System.Diagnostics.Debug.WriteLine("TransportId:{0}, ParkNumber:{1}, ModelId:{2}, TypeId:{3}, LastLatitude:{4}, LastLongitude:{5}, LastTimeStamp:{6}, LastZone:{7}", 
-                    t.TransportId, t.ParkNumber, t.ModelId, t.TypeId, t.CurrentLatitude, t.CurrentLongitude, t.CurrentTimeStamp, t.CurrentZone);                
+                System.Diagnostics.Debug.WriteLine("TransportId:{0}, ParkNumber:{1}, ModelId:{2}, TypeId:{3}, LastLatitude:{4}, LastLongitude:{5}, LastTimeStamp:{6}", 
+                    t.TransportId, t.ParkNumber, t.ModelId, t.TypeId, t.CurrentLocation.Latitude, t.CurrentLocation.Longitude, t.CurrentTimeStamp);                
             }
         }
         void TestZones()
@@ -66,8 +66,18 @@ namespace testApp
         void TestStates()
         {
             System.Diagnostics.Debug.WriteLine("\nTransport states:");
-            string output = TransportProgress.GetCurrentStates();
+            string output = GetCurrentStates();
             System.Diagnostics.Debug.WriteLine(output);
+        }
+        string GetCurrentStates()
+        {
+            string result = string.Empty;
+            foreach (var item in TransportProgress.Items)
+            {
+                string id = item.TransportId;
+                result += string.Format("{0,3}: {1}\n", id, TransportProgress[id].CurrentState.GetCurrentState());
+            }
+            return result;
         }
     }
 }

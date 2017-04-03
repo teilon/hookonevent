@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,55 +24,31 @@ namespace calcevent.progress
         string _id = "";
         string _displayName = "";
         int _type = -1;
-        List<PointItem> _points;
+        List<GeoCoordinate> _points;
 
         string _excavatorid = "";
 
         public string Id { get { return _id; } set { if (_id == "") _id = value; } }
         public string DisplayName { get { return _displayName; } set { _displayName = value; } }
         public int Type { get { return _type; } set { _type = value; } }
-        public List<PointItem> Points { get { return _points; } }
+        public List<GeoCoordinate> Points { get { return _points; } }
 
         public string ExcavatorId { get { return _excavatorid; } set { if (_excavatorid == "") _excavatorid = value; } }
+        public GeoCoordinate this[int index] { get { return _points[index]; } set { _points[index] = value; } }
 
         public ZoneItem()
         {
-            _points = new List<PointItem>();
+            _points = new List<GeoCoordinate>();
         }
         public ZoneItem(string id)
             :this()
         {
             _id = id;
         }
-        public void AddPoint(double x, double y)
+        public void AddPoint(double lat, double lon)
         {
-            _points.Add(new PointItem(x, y));
+            _points.Add(new GeoCoordinate(lat, lon));
         }
-        public class PointItem
-        {
-            double _x;
-            double _y;
-            public double X { get { return _x; } }
-            public double Y { get { return _y; } }
-            public PointItem(double x, double y)
-            {
-                _x = x;
-                _y = y;
-            }
-        }
-    }
-    public class ZoneEventKey
-    {
-        string _eventid = "";
-        string _zoneid = "";
-        string _excavatorid = "";
-        string _oretypeid = "";
-        double _oreweight = 0;
-
-        public string EventId { get { return _eventid; } set { _eventid = value; } }
-        public string ZoneId { get { return _zoneid; } set { _zoneid = value; } }
-        public string ExcavatorId { get { return _excavatorid; } set { _excavatorid = value; } }
-        public string OreTypeId { get { return _oretypeid; } set { _oretypeid = value; } }
-        public double OreWeight { get { return _oreweight; } set { _oreweight = value; } }
+        
     }
 }

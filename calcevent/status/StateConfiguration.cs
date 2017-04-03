@@ -25,7 +25,7 @@ namespace calcevent.status
         _UX, _OX, _LX,
         UX_, OX_, LX_
     }
-    public class StateInterface : IBaseState
+    public class StateInterface : IOutagerState, IMoverState
     {
         protected Dictionary<State, StateConfigurator> _rules;
         protected State _currentState;
@@ -36,7 +36,8 @@ namespace calcevent.status
             _currentState = State.NN;
             _rules = new Dictionary<State, StateConfigurator>();
 
-            BaseRule.AddBaseRules(ref _rules);
+            MoveRule.AddMoveRules(ref _rules);
+            OutageRule.AddOutageRules(ref _rules);
         }
 
         public string GetCurrentState()
@@ -70,18 +71,18 @@ namespace calcevent.status
             _currentState = CurrentState.GetDestinationState(Trigger._M);
             return GetCurrentState();
         }
-
         public string ToStop()
         {
             _currentState = CurrentState.GetDestinationState(Trigger._O);
             return GetCurrentState();
         }
     }    
-    public class TruckInterface : StateInterface, ILoaderState
+    public class TruckInterface : StateInterface, ILoaderState, IUnloaderState
     {
         public TruckInterface()
         {
             LoadRule.AddLoadRules(ref _rules);
+            UnloadRule.AddUnloadRules(ref _rules);
         }
         public string OnLoad()
         {
@@ -94,6 +95,19 @@ namespace calcevent.status
             _currentState = CurrentState.GetDestinationState(Trigger._Z);
             return GetCurrentState();
         }
+
+        public string OnUnload()
+        {
+            _currentState = CurrentState.GetDestinationState(Trigger._U);
+            return GetCurrentState();
+        }
+
+        public string OnUnloadingZone()
+        {
+            throw new NotImplementedException();
+        }
+
+        
     }
     public class ExcavatorInterface : StateInterface
     {

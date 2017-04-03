@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Device" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,15 +44,18 @@
     <Compile Include="dump\Geozone.cs" />
     <Compile Include="dump\Transport.cs" />
     <Compile Include="EventManager.cs" />
+    <Compile Include="progress\TransportMonitor.cs" />
     <Compile Include="progress\TransportDict.cs" />
     <Compile Include="progress\TransportDict_Setter.cs" />
     <Compile Include="progress\TransportProgress.cs" />
     <Compile Include="progress\ZoneProgress.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="status\ILoaderState.cs" />
+    <Compile Include="status\states\ILoaderState.cs" />
+    <Compile Include="status\states\IMoverState.cs" />
+    <Compile Include="status\states\IOutagerState.cs" />
+    <Compile Include="status\states\IUnloaderState.cs" />
     <Compile Include="status\StateConfiguration.cs" />
     <Compile Include="status\TriggerConfigurator.cs" />
-    <Compile Include="status\IBaseState.cs" />
     <Compile Include="TestEM.cs" />
     <Compile Include="TrackMessageRecipient.cs" />
   </ItemGroup>

@@ -70,8 +70,8 @@ namespace testApp
                     _ti.ParkNumber = t.ParkNumber;
                     _ti.ModelId = t.ModelId;
                     _ti.TypeId = t.TypeId;
-                    _ti.CurrentLatitude = (double)t.LastLatitude;
-                    _ti.CurrentLongitude = (double)t.LastLongitude;
+                    _ti.CurrentLocation.Latitude = (double)t.LastLatitude;
+                    _ti.CurrentLocation.Longitude = (double)t.LastLongitude;
 
                     _trp.Add(_ti);
 
