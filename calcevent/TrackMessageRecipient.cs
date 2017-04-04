@@ -10,10 +10,8 @@ namespace calcevent
 {
     public class MessageRecipient
     {
-        TransportProgress _trp;
-        ZoneProgress _znp;
-        public TransportProgress TransportProgress { get { return _trp; } }
-        public ZoneProgress ZoneProgress { get { return _znp; } }
+        TransportMonitor _tm = new TransportMonitor();
+        public TransportMonitor TransportMonitor { get { return _tm; } }
 
         enum Device { none, android, fortold, fort };
 
@@ -22,11 +20,11 @@ namespace calcevent
         
         public void addTransportList(List<TransportItem> trp)
         {
-            _trp = new TransportProgress(trp);
+            _tm.AddTransport(trp);
         }
         public void addZoneList(List<ZoneItem> znp)
         {
-            _znp = new ZoneProgress(znp);
+            _tm.AddZone(znp);
         }
 
         public void AddMessage(string input)
@@ -75,8 +73,8 @@ namespace calcevent
             string driverMessage = a[2].Split(':')[1];
             string oreType = a[3].Split(':')[1];
             
-            _trp.AddMessage(deviceID, timestamp, driverMessage, oreType);
-                        
+            _tm.AddMessage(deviceID, timestamp, driverMessage, oreType);
+
             return result;
         }
         string fromFortDevice(string input)
@@ -99,8 +97,8 @@ namespace calcevent
             double heading = double.Parse(a[6].Split(':')[1].Replace('.', ','));
             double altitude = double.Parse(a[7].Split(':')[1].Replace('.', ','));
 
-            _trp.AddMessage(deviceID, timestamp, statusCode, latitude, longitude, speedKPH, heading, altitude);
-            
+            _tm.AddMessage(deviceID, timestamp, statusCode, latitude, longitude, speedKPH, heading, altitude);
+
             return result;
         }
     }

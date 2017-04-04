@@ -7,18 +7,6 @@ using System.Threading.Tasks;
 
 namespace calcevent.progress
 {
-    public class ZoneProgress
-    {
-        List<ZoneItem> _items;
-        public List<ZoneItem> Items { get { return _items; } }
-        public ZoneItem this[string zoneId] { get { return _items.Where(x => x.Id == zoneId).FirstOrDefault(); } }
-
-        public ZoneProgress(List<ZoneItem> _list)
-        {
-            _items = _list;
-        }
-    }
-
     public class ZoneItem
     {
         string _id = "";
@@ -45,7 +33,7 @@ namespace calcevent.progress
         {
             _id = id;
         }
-        public void AddPoint(double lat, double lon)
+        public void AddPoint(double lon, double lat)
         {
             _points.Add(new GeoCoordinate(lat, lon));
         }

@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace calcevent.progress
 {
-    class TransportMonitor
+    public class TransportMonitor
     {
+        enum Device { Tracker, Tablet };
         TransportList _transports = new TransportList();
         ZoneList _zones = new ZoneList();
         public TransportList Transports { get { return _transports; } }        
@@ -18,10 +19,24 @@ namespace calcevent.progress
         public void AddTransport(List<TransportItem> dataList)
         {            
             _transports.AddRange(dataList);
+            if (Zones.Count != 0)
+                SyncZoneExcv();
         }
         public void AddZone(List<ZoneItem> dataList)
         {            
             _zones.AddRange(dataList);
+            if (Transports.Count != 0)
+                SyncZoneExcv();
+        }
+        //synchronization zone with excavotor
+        void SyncZoneExcv()
+        {
+            foreach(var z in _zones.Where(x => x.Type == 1))
+                foreach(var e in _transports.Where(x => x.TypeId == "2"))
+                {
+                    if (z.Points[0] == e.CurrentLocation)
+                        z.ExcavatorId = e.TransportId;
+                }
         }
         //add message
         public void AddMessage(string deviceId, string timestamp, string statuscode, string oreType)
@@ -31,7 +46,9 @@ namespace calcevent.progress
                 return;
             _ti.CurrentTimeStamp = timestamp;
             _ti.CurrentOreType = oreType;
-            //ChangeStatusCode();
+
+            if (_ti.TypeId == "1")
+                CalcTruck(_ti, Device.Tablet, statuscode);
         }
         public void AddMessage(string deviceId, string timestamp, string statuscode,
             double latitude, double longitude, double speedKPH, double heading, double altitude)
@@ -48,34 +65,40 @@ namespace calcevent.progress
                 CalcTruck(_ti);
         }
         //calc
-        void CalcTruck(TransportItem transport)
+        void CalcTruck(TransportItem transport, Device d = Device.Tracker, string statuscode = "NN")
         {
             GeoCoordinate location = transport.CurrentLocation;
             string deviceId = transport.TransportId;
             string oldState = transport.CurrentState.GetCurrentState();
             if (location == null)
                 return;
-
+            
             Dictionary<string, string> checkZone = _zones.GetIntersect(location);
             if (checkZone["isIntersect"] == "no")
             {
                 if (transport.CurrentSpeed == 0)
                 {
                     (transport.CurrentState as IOutagerState).ToStop();
+
+                    if (transport.CurrentState.GetCurrentState() != oldState)
+                        saveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
                 else
                 {
                     (transport.CurrentState as IMoverState).ToMove();
+
+                    if (transport.CurrentState.GetCurrentState() != oldState)
+                        saveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
                 return;
-            }                
+            }
             if(checkZone["type"] == "1")
             {
-                if(checkZone["zonelocation"] == "target" && transport.CurrentSpeed == 0)
+                if(checkZone["zonelocation"] == "target" || (d == Device.Tablet && statuscode == "LL"))
                 {                    
                     (transport.CurrentState as ILoaderState).OnLoad();
                 }
-                if (checkZone["zonelocation"] == "zone")
+                else if (checkZone["zonelocation"] == "zone")
                 {
                     (transport.CurrentState as ILoaderState).OnLoadingZone();
                 }
@@ -85,11 +108,11 @@ namespace calcevent.progress
                     TransportEventKey _tek = transport.LastKeyEvent;
                     _tek.Fill(transport.CurrentState.GetCurrentState(), checkZone["zoneId"], checkZone["excavatorId"], transport.CurrentOreType);
 
-                    saveLoadEvent(deviceId, checkZone["excavatorId"], checkZone["zoneId"], transport.CurrentOreType);
+                    saveEvent(deviceId, checkZone["excavatorId"], checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
             }
                 
-            if (checkZone["type"] == "3")
+            if (checkZone["type"] == "3" || (d == Device.Tablet && statuscode == "UU"))
             {
                 (transport.CurrentState as IUnloaderState).OnUnload();
                 if (transport.CurrentState.GetCurrentState() != oldState)
@@ -97,21 +120,18 @@ namespace calcevent.progress
                     TransportEventKey _tek = transport.LastKeyEvent;
                     _tek.Fill(transport.CurrentState.GetCurrentState(), checkZone["zoneId"], "-", transport.CurrentOreType);
 
-                    saveUnloadEvent(deviceId, checkZone["zoneId"], transport.CurrentOreType);
+                    saveEvent(deviceId, "", checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
             }
-                
         }
-        void saveLoadEvent(string truckid, string excavatorid, string zoneid, string oretype)
+        void saveEvent(string truckid, string excavatorid, string zoneid, string oretype, string timestamp)
         {
-            //save load
-        }
-        void saveUnloadEvent(string truckid, string zoneid, string oretype)
-        {
-            //save unload
+            //save event
+            string output = string.Format("truckid:{0}, excavatorid:{1}, zoneid:{2}, oretype:{3}, timestamp:{4}", truckid, excavatorid, zoneid, oretype, timestamp);
+            //TXTWriter.Write(output);
         }
     }
-    class TransportList : List<TransportItem>
+    public class TransportList : List<TransportItem>
     {
         public TransportList()
         {
