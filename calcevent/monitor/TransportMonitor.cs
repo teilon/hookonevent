@@ -15,10 +15,13 @@ namespace calcevent.progress
         ZoneList _zones = new ZoneList();
         public TransportList Transports { get { return _transports; } }        
         public ZoneList Zones { get { return _zones; } }
+
+        public TransportItem this[string id] { get { return Transports.Where(x => x.TransportId == id).FirstOrDefault(); } }  
         //for init
         public void AddTransport(List<TransportItem> dataList)
         {            
             _transports.AddRange(dataList);
+            _transports.TransportInit();
             if (Zones.Count != 0)
                 SyncZoneExcv();
         }
@@ -81,14 +84,14 @@ namespace calcevent.progress
                     (transport.CurrentState as IOutagerState).ToStop();
 
                     if (transport.CurrentState.GetCurrentState() != oldState)
-                        saveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
+                        SaveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
                 else
                 {
                     (transport.CurrentState as IMoverState).ToMove();
 
                     if (transport.CurrentState.GetCurrentState() != oldState)
-                        saveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
+                        SaveEvent(deviceId, "", "", transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
                 return;
             }
@@ -108,7 +111,7 @@ namespace calcevent.progress
                     TransportEventKey _tek = transport.LastKeyEvent;
                     _tek.Fill(transport.CurrentState.GetCurrentState(), checkZone["zoneId"], checkZone["excavatorId"], transport.CurrentOreType);
 
-                    saveEvent(deviceId, checkZone["excavatorId"], checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
+                    SaveEvent(deviceId, checkZone["excavatorId"], checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
             }
                 
@@ -119,21 +122,23 @@ namespace calcevent.progress
                 {
                     TransportEventKey _tek = transport.LastKeyEvent;
                     _tek.Fill(transport.CurrentState.GetCurrentState(), checkZone["zoneId"], "-", transport.CurrentOreType);
+                    transport.CurrentOreType = "";
 
-                    saveEvent(deviceId, "", checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
+                    SaveEvent(deviceId, "", checkZone["zoneId"], transport.CurrentOreType, transport.CurrentTimeStamp);
                 }
             }
         }
-        void saveEvent(string truckid, string excavatorid, string zoneid, string oretype, string timestamp)
+        void SaveEvent(string truckid, string excavatorid, string zoneid, string oretype, string timestamp)
         {
             //save event
             string output = string.Format("truckid:{0}, excavatorid:{1}, zoneid:{2}, oretype:{3}, timestamp:{4}", truckid, excavatorid, zoneid, oretype, timestamp);
+            System.Diagnostics.Debug.WriteLine(output);
             //TXTWriter.Write(output);
         }
     }
     public class TransportList : List<TransportItem>
     {
-        public TransportList()
+        public void TransportInit()
         {
             foreach (var item in this)
             {

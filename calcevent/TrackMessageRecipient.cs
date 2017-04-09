@@ -18,11 +18,11 @@ namespace calcevent
         string pattern_fort = "deviceID:[\"'][\\w\\d_-]+[\"'],timestamp:\\d+,statusCode:[\\w\\d_-]+,latitude:\\d+\\.?\\d+,longitude:\\d+\\.?\\d+,speedKPH:\\d+\\.?\\d*,heading:\\d+\\.?\\d*,altitude:\\d+\\.?\\d*";
         string pattern_tabl = "(deviceID|transportID):[\"'][\\w\\d_-]+[\"'],timestamp:\\d+,(driverMessage|transportStatus):\\d{4},oreType:\\d+";
         
-        public void addTransportList(List<TransportItem> trp)
+        public void AddTransportList(List<TransportItem> trp)
         {
             _tm.AddTransport(trp);
         }
-        public void addZoneList(List<ZoneItem> znp)
+        public void AddZoneList(List<ZoneItem> znp)
         {
             _tm.AddZone(znp);
         }
@@ -36,17 +36,17 @@ namespace calcevent
             foreach (Match m in Regex.Matches(input, pattern))
             {
                 if (result != string.Empty) result += ",";
-                Device _device = deviceIs(m.Value);
+                Device _device = DeviceIs(m.Value);
                 switch (_device)
                 {
                     case Device.android:
-                        result += fromAndroidDevice(m.Value); break;
+                        result += FromAndroidDevice(m.Value); break;
                     case Device.fort:
-                        result += fromFortDevice(m.Value); break;
+                        result += FromFortDevice(m.Value); break;
                 }
             }
         }
-        Device deviceIs(string input)
+        Device DeviceIs(string input)
         {
             Regex reg;
             reg = new Regex(pattern_tabl);
@@ -57,7 +57,7 @@ namespace calcevent
                 return Device.fort;
             return Device.none;
         }
-        string fromAndroidDevice(string input)
+        string FromAndroidDevice(string input)
         {
             string result = string.Empty;
             if (input == null)
@@ -73,11 +73,15 @@ namespace calcevent
             string driverMessage = a[2].Split(':')[1];
             string oreType = a[3].Split(':')[1];
             
-            _tm.AddMessage(deviceID, timestamp, driverMessage, oreType);
+            _tm.AddMessage(deviceID, timestamp, Translator.DBKeyToKey[driverMessage], oreType);
+
+            TransportItem _ti = _tm[deviceID];
+            result = string.Format("{{transportId:{0},statuscode:{1},timestamp:{2},oretype:{3}}}",
+                _ti.TransportId, _ti.LastEventId, _ti.CurrentTimeStamp, _ti.CurrentOreType);
 
             return result;
         }
-        string fromFortDevice(string input)
+        string FromFortDevice(string input)
         {
             string result = string.Empty;
             if (input == null)
@@ -91,13 +95,17 @@ namespace calcevent
                 deviceID = deviceID.Split('\"')[1];
             string timestamp = a[1].Split(':')[1];
             string statusCode = a[2].Split(':')[1];
-            double latitude = double.Parse(a[3].Split(':')[1].Replace('.', ','));
-            double longitude = double.Parse(a[4].Split(':')[1].Replace('.', ','));
-            double speedKPH = double.Parse(a[5].Split(':')[1].Replace('.', ','));
-            double heading = double.Parse(a[6].Split(':')[1].Replace('.', ','));
-            double altitude = double.Parse(a[7].Split(':')[1].Replace('.', ','));
+            double latitude = double.Parse(a[3].Split(':')[1]);//.Replace('.', ','));
+            double longitude = double.Parse(a[4].Split(':')[1]);//.Replace('.', ','));
+            double speedKPH = double.Parse(a[5].Split(':')[1]);//.Replace('.', ','));
+            double heading = double.Parse(a[6].Split(':')[1]);//.Replace('.', ','));
+            double altitude = double.Parse(a[7].Split(':')[1]);//.Replace('.', ','));
 
             _tm.AddMessage(deviceID, timestamp, statusCode, latitude, longitude, speedKPH, heading, altitude);
+
+            TransportItem _ti = _tm[deviceID];
+            result = string.Format("{{transportId:{0},statuscode:{1},timestamp:{2},oretype:{3}}}", 
+                _ti.TransportId, _ti.LastEventId, _ti.CurrentTimeStamp, _ti.CurrentOreType);
 
             return result;
         }
