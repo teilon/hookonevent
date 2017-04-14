@@ -15,7 +15,13 @@ namespace calcevent
 
         enum Device { none, android, fortold, fort };
 
-        string pattern_fort = "deviceID:[\"'][\\w\\d_-]+[\"'],timestamp:\\d+,statusCode:[\\w\\d_-]+,latitude:\\d+\\.?\\d+,longitude:\\d+\\.?\\d+,speedKPH:\\d+\\.?\\d*,heading:\\d+\\.?\\d*,altitude:\\d+\\.?\\d*";
+        bool _saveit = false;
+        Dictionary<string, string> _tosave = new Dictionary<string, string>();
+        public bool SaveIt { get { return GetSaveCheck(); } }
+        public Dictionary<string, string> OutputDict { get { return _tosave; } }
+
+        string pattern_fort = "deviceID:[\"\'][\\w\\d_-]+[\"\'],timestamp:\\d+,statusCode:[\\w\\d_-]+,latitude:\\d+\\.?\\d+,longitude:\\d+\\.?\\d+,speedKPH:\\d+\\.?\\d*,heading:\\d+\\.?\\d*,altitude:\\d+\\.?\\d*";
+        //[{                   deviceID:'804',                timestamp:1492172034,statusCode:63646,latitude:43.236474609375,longitude:76.8740234375,speedKPH:1.2,      heading:345.0,      altitude:804.0}]
         string pattern_tabl = "(deviceID|transportID):[\"'][\\w\\d_-]+[\"'],timestamp:\\d+,(driverMessage|transportStatus):\\d{4},oreType:\\d+";
         string pattern_fort_old = "deviceID:[\"'][\\w\\d_-]+[\"'],\\s?timestamp:\\d+,\\s?latitude:\\d+\\.?\\d+,\\s?longitude:\\d+\\.?\\d+,\\s?speedKPH:\\d+\\.?\\d*,\\s?heading:\\d+\\.?\\d*,\\s?altitude:\\d+\\.?\\d*";
         //[{                       deviceID:'353218074563660', timestamp:1492062675, latitude:52.54724934895834, longitude:62.750284830729164, speedKPH:2.5, heading:218.0, altitude:202.0}]
@@ -69,9 +75,8 @@ namespace calcevent
         }
         string FromAndroidDevice(string input)
         {
-            string result = string.Empty;
             if (input == null)
-                return result;
+                return "";
 
             var a = input.Split(',');
             string deviceID = a[0].Split(':')[1];
@@ -84,12 +89,50 @@ namespace calcevent
             string oreType = a[3].Split(':')[1];
             
             _tm.AddMessage(deviceID, timestamp, Translator.DBKeyToKey[driverMessage], oreType);
+                                        
+            return GetResult(deviceID);
+        }
+        string GetResult(string deviceID)
+        {
+            TransportItem _ti;
+            try
+            {
+                _ti = _tm[deviceID];
+            }
+            catch (ArgumentNullException e)
+            {
+                TXTWriter.Write(string.Format("on deviceId:{0} catch {1}\n", deviceID, e.Message));
+                return string.Format("{{transportId:,statuscode:,timestamp:,oretype:}}");
+            }
+            
+            if (_ti.SaveIt)
+            {
+                TransportEventKey _ek = _ti.LastKeyEvent;
+                PreSave(_ek.TruckId, Translator.KeyToDBKey[_ek.EventId], _ek.ZoneId, _ek.ExcavatorId, _ek.OreTypeId, _ek.OreWeight, _ek.Timestamp);
+            }
 
-            TransportItem _ti = _tm[deviceID];
-            result = string.Format("{{transportId:{0},statuscode:{1},timestamp:{2},oretype:{3}}}",
-                _ti.TransportId, _ti.LastEventId, _ti.CurrentTimeStamp, _ti.CurrentOreType);
+            string _result = string.Format("\"timestamp\":{0},\"transportID\":\"{1}\",\"transportStatus\":{2},\"oreType\":{3},\"rockMass\":{4}",
+                _ti.CurrentTimeStamp, _ti.TransportId, Translator.KeyToDBKey[_ti.LastEventId], _ti.CurrentOreType, _ti.OreWeight);
 
-            return result;
+            return "{" + _result + "}";
+        }
+
+
+        bool GetSaveCheck()
+        {
+            bool _result = _saveit;
+            _saveit = false;
+            return _result;
+        }
+        void PreSave(string truckid, string eventid, string zoneid, string excavatorid, string oretypeid, double oreweight, string timestamp)
+        {            
+            _tosave["truckid"] = truckid;
+            _tosave["eventid"] = eventid;
+            _tosave["zoneid"] = zoneid;
+            _tosave["excavatorid"] = excavatorid;
+            _tosave["oretypeid"] = oretypeid;
+            _tosave["oreweight"] = oreweight.ToString();
+            _tosave["timestamp"] = timestamp;
         }
         string FromFortDevice(string input)
         {
@@ -105,19 +148,15 @@ namespace calcevent
                 deviceID = deviceID.Split('\"')[1];
             string timestamp = a[1].Split(':')[1];
             string statusCode = a[2].Split(':')[1];
-            double latitude = double.Parse(a[3].Split(':')[1]);//.Replace('.', ','));
-            double longitude = double.Parse(a[4].Split(':')[1]);//.Replace('.', ','));
-            double speedKPH = double.Parse(a[5].Split(':')[1]);//.Replace('.', ','));
-            double heading = double.Parse(a[6].Split(':')[1]);//.Replace('.', ','));
-            double altitude = double.Parse(a[7].Split(':')[1]);//.Replace('.', ','));
-
+            double latitude = double.Parse(a[3].Split(':')[1].Replace('.', ','));
+            double longitude = double.Parse(a[4].Split(':')[1].Replace('.', ','));
+            double speedKPH = double.Parse(a[5].Split(':')[1].Replace('.', ','));
+            double heading = double.Parse(a[6].Split(':')[1].Replace('.', ','));
+            double altitude = double.Parse(a[7].Split(':')[1].Replace('.', ','));
+            
             _tm.AddMessage(deviceID, timestamp, statusCode, latitude, longitude, speedKPH, heading, altitude);
 
-            TransportItem _ti = _tm[deviceID];
-            result = string.Format("{{transportId:{0},statuscode:{1},timestamp:{2},oretype:{3}}}", 
-                _ti.TransportId, _ti.LastEventId, _ti.CurrentTimeStamp, _ti.CurrentOreType);
-
-            return result;
+            return GetResult(deviceID);
         }
         string FromOldFortDevice(string input)
         {
@@ -143,12 +182,9 @@ namespace calcevent
             
             _tm.AddMessage(device, timestamp, _statusCode, latitude, longitude, speedKPH, heading, altitude);
             
-            TransportItem _ti = _tm[device];
-            result = string.Format("{{transportId:{0},statuscode:{1},timestamp:{2},oretype:{3}}}",
-                _ti.TransportId, _ti.LastEventId, _ti.CurrentTimeStamp, _ti.CurrentOreType);
-            
-            return result;
+            return GetResult(deviceID);
         }
+
         Dictionary<string, string> devices = new Dictionary<string, string>()
         {
             { "354868056800875", "800"},

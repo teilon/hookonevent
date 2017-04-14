@@ -10,6 +10,8 @@ namespace calcevent.progress
 {   
     public class TransportItem
     {
+        const double _TEMPOREWEIGHT = 130;
+
         string _transportid = "";
         string _parknumber = "";
         string _modelid = "";
@@ -17,17 +19,21 @@ namespace calcevent.progress
 
         GeoCoordinate _location;
         string _currenttimestamp = "0";
-        string _currentoretype = "";
+        string _currentoretype = "0";
         double _currentspeed = 0;
+        double _currentoreweight = _TEMPOREWEIGHT;
 
         TransportEventKey _lastkeyevent = new TransportEventKey();
         StateInterface _currentstate;
+
+        bool _saveit = false;
 
         public string TransportId { get { return _transportid; } set { if (_transportid == "") _transportid = value; } }
         public string ParkNumber { get { return _parknumber; } set { if (_parknumber == "") _parknumber = value; } }
         public string ModelId { get { return _modelid; } set { if (_modelid == "") _modelid = value; } }
         public string TypeId { get { return _typeid; } set { if (_typeid == "") _typeid = value; } }
-        
+        public double OreWeight { get { return (_currentoretype == "") ? 0 : _currentoreweight; } }
+
         public string CurrentTimeStamp { get { return _currenttimestamp; } set { _currenttimestamp = value; } }
         public string CurrentOreType { get { return _currentoretype; } set { _currentoretype = value; } }
         public GeoCoordinate CurrentLocation { get { return _location; } set { _location = value; } }
@@ -35,42 +41,59 @@ namespace calcevent.progress
 
         public string LastEventId { get { return _currentstate.GetCurrentState(); } }
         public TransportEventKey LastKeyEvent { get { return _lastkeyevent; } }
-        public StateInterface CurrentState { get { return _currentstate; } set { _currentstate = value; } }        
+        public StateInterface CurrentState { get { return _currentstate; } set { _currentstate = value; } }      
+        public bool SaveIt { get { return GetSaveCheck(); } }
 
         public TransportItem(string transportid)
         {
             _transportid = transportid;
             _location = new GeoCoordinate();
         }
+        public void PreSave(string truckid, string excavatorid, string zoneid)
+        {
+            string eventid = _currentstate.GetCurrentState();
+            string oretypeid = _currentoretype;
+            string timestamp = _currenttimestamp;
+
+            LastKeyEvent.Fill(truckid, eventid, zoneid, excavatorid, oretypeid, timestamp);
+            _saveit = true;
+        }
+        bool GetSaveCheck()
+        {
+            bool _result = _saveit;
+            _saveit = false;
+            return _result;
+        }
     }
 
     public class TransportEventKey
-    {
-        string _TEMPORETYPEID = "5";
-        double _TEMPOREWEIGHT = 130;
+    {        
+        const double _TEMPOREWEIGHT = 130;
 
+        string _truckid = "";
         string _eventid = "";
         string _zoneid = "";
         string _excavatorid = "";
         string _oretypeid = "";
-        double _oreweight = 0;
+        double _oreweight = _TEMPOREWEIGHT;
+        string _timestamp = "";
 
-        public string EventId { get { return _eventid; } set { _eventid = value; } }
-        public string ZoneId { get { return _zoneid; } set { _zoneid = value; } }
-        public string ExcavatorId { get { return _excavatorid; } set { _excavatorid = value; } }
-        public string OreTypeId { get {
-                return (_oretypeid == "") ? _TEMPORETYPEID : _oretypeid;
-            } set { _oretypeid = value; } }
-        public double OreWeight { get {
-                return (_oretypeid == "") ? _TEMPOREWEIGHT : _oreweight;
-            } set { _oreweight = value; } }
+        public string TruckId { get { return _eventid; } }
+        public string EventId { get { return _eventid; } }
+        public string ZoneId { get { return _zoneid; } }
+        public string ExcavatorId { get { return _excavatorid; } }
+        public string OreTypeId { get { return _oretypeid; } }
+        public double OreWeight { get { return (_oretypeid == "") ? 0 : _oreweight; } }
+        public string Timestamp { get { return _timestamp; } }
 
-        public void Fill(string eventid, string zoneid, string excavatorid, string oretypeid)
+        public void Fill(string truckid, string eventid, string zoneid, string excavatorid, string oretypeid, string timestamp)
         {
+            _truckid = truckid;
             _eventid = eventid;
             _zoneid = zoneid;
             _excavatorid = excavatorid;
             _oretypeid = oretypeid;
+            _timestamp = timestamp;
         }
     }
 
