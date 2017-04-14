@@ -11,6 +11,8 @@ namespace calcevent.progress
     public class TransportItem
     {
         const double _TEMPOREWEIGHT = 130;
+        const double _OREWEIGHTISEMPTY = 0;
+        const string _DEFAULTORETYPE = "0";
 
         string _transportid = "";
         string _parknumber = "";
@@ -19,7 +21,7 @@ namespace calcevent.progress
 
         GeoCoordinate _location;
         string _currenttimestamp = "0";
-        string _currentoretype = "0";
+        string _currentoretype = _DEFAULTORETYPE;
         double _currentspeed = 0;
         double _currentoreweight = _TEMPOREWEIGHT;
 
@@ -32,7 +34,7 @@ namespace calcevent.progress
         public string ParkNumber { get { return _parknumber; } set { if (_parknumber == "") _parknumber = value; } }
         public string ModelId { get { return _modelid; } set { if (_modelid == "") _modelid = value; } }
         public string TypeId { get { return _typeid; } set { if (_typeid == "") _typeid = value; } }
-        public double OreWeight { get { return (_currentoretype == "") ? 0 : _currentoreweight; } }
+        public double OreWeight { get { return (_currentoretype == _DEFAULTORETYPE) ? _OREWEIGHTISEMPTY : _currentoreweight; } }
 
         public string CurrentTimeStamp { get { return _currenttimestamp; } set { _currenttimestamp = value; } }
         public string CurrentOreType { get { return _currentoretype; } set { _currentoretype = value; } }
