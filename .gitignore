@@ -2,7 +2,12 @@
 # debug files calcevent
 calcevent/bin
 calcevent/obj
+calcevent/Properties
 
 # debug files testApp
 testApp/testApp/bin
 testApp/testApp/obj
+testApp/testApp/Properties
+
+
+testApp/testApp.sln
