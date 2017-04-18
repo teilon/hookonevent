@@ -26,6 +26,12 @@ namespace calcevent.status
             if (!_rule.ContainsKey(State.NM))
                 _rule[State.NM] = new StateConfigurator(State.NM);
             _rule[State.NM].Permit(Trigger._U, State.UU);
+            //
+            //
+            //temp
+            if (!_rule.ContainsKey(State.LZ))
+                _rule[State.LZ] = new StateConfigurator(State.LZ);
+            _rule[State.LZ].Permit(Trigger._U, State.UU);
         }
     }
 }

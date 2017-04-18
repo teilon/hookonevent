@@ -35,11 +35,19 @@ namespace calcevent.progress
         void SyncZoneExcv()
         {
             foreach(var z in _zones.Where(x => x.Type == 1))
-                foreach(var e in _transports.Where(x => x.TypeId == "2"))
+            {
+                foreach (var e in _transports.Where(x => x.TypeId == "2"))
                 {
                     if (z.Points[0] == e.CurrentLocation)
+                    {
                         z.ExcavatorId = e.TransportId;
+                        TXTWriter.Write(string.Format("{0, 10}[{1}|{2}] : {3, 10}[{4}|{5}]\n", 
+                            z.DisplayName, z.Points[0].Latitude, z.Points[0].Longitude,
+                            e.TransportId, e.CurrentLocation.Latitude, e.CurrentLocation.Longitude));
+                    }
+                        
                 }
+            }                
         }
         //add message
         public void AddMessage(string deviceId, string timestamp, string statuscode, string oreType)
@@ -100,6 +108,8 @@ namespace calcevent.progress
                 if(checkZone["zonelocation"] == "target" || (d == Device.Tablet && statuscode == "LL"))
                 {                    
                     (transport.CurrentState as ILoaderState).OnLoad();
+                    if (transport.CurrentOreType == "0")
+                        transport.CurrentOreType = "5";
                 }
                 else if (checkZone["zonelocation"] == "zone")
                 {
@@ -118,7 +128,7 @@ namespace calcevent.progress
                 if (transport.CurrentState.GetCurrentState() != oldState)
                 {                    
                     transport.PreSave(deviceId, checkZone["excavatorId"], checkZone["zoneId"]);
-                    transport.CurrentOreType = "";
+                    transport.CurrentOreType = "0";
                 }
             }
         }
