@@ -17,7 +17,7 @@ namespace calcevent.status
         {
             if (!_rule.ContainsKey(State.NN))
                 _rule[State.NN] = new StateConfigurator(State.NN);
-            _rule[State.NN].Permit(Trigger.U_, State.UM);
+            _rule[State.NN].Permit(Trigger.U_, State.UU);
             //
             if (!_rule.ContainsKey(State.LM))
                 _rule[State.LM] = new StateConfigurator(State.LM);
@@ -26,12 +26,16 @@ namespace calcevent.status
             if (!_rule.ContainsKey(State.NM))
                 _rule[State.NM] = new StateConfigurator(State.NM);
             _rule[State.NM].Permit(Trigger._U, State.UU);
+
+            if (!_rule.ContainsKey(State.UU))
+                _rule[State.UU] = new StateConfigurator(State.UU);
+            _rule[State.UU].Permit(Trigger._M, State.UM);
             //
             //
             //temp
-            if (!_rule.ContainsKey(State.LZ))
-                _rule[State.LZ] = new StateConfigurator(State.LZ);
-            _rule[State.LZ].Permit(Trigger._U, State.UU);
+            //if (!_rule.ContainsKey(State.LZ))
+            //    _rule[State.LZ] = new StateConfigurator(State.LZ);
+            //_rule[State.LZ].Permit(Trigger._U, State.UU);
         }
     }
 }
