@@ -41,6 +41,7 @@ namespace calcevent.progress
                     if (z.Points[0] == e.CurrentLocation)
                     {
                         z.ExcavatorId = e.TransportId;
+                        e.ZoneId = z.Id;
                         TXTWriter.Write(string.Format("{0, 10}[{1}|{2}] : {3, 10}[{4}|{5}]\n", 
                             z.DisplayName, z.Points[0].Latitude, z.Points[0].Longitude,
                             e.TransportId, e.CurrentLocation.Latitude, e.CurrentLocation.Longitude));
@@ -74,6 +75,8 @@ namespace calcevent.progress
                         
             if (_ti.TypeId == "1")
                 CalcTruck(_ti);
+            if (_ti.TypeId == "2")
+                CalcExcv(_ti);
         }
         //calc
         void CalcTruck(TransportItem transport, Device d = Device.Tracker, string statuscode = "NN")
@@ -92,14 +95,14 @@ namespace calcevent.progress
                     (transport.CurrentState as IOutagerState).ToStop();
 
                     if (transport.CurrentState.GetCurrentState() != oldState)
-                        transport.PreSave(deviceId, "", "");
+                        transport.PreSave(deviceId, "", "-1");
                 }
                 else
                 {
                     (transport.CurrentState as IMoverState).ToMove();
 
                     if (transport.CurrentState.GetCurrentState() != oldState)
-                        transport.PreSave(deviceId, "", "");
+                        transport.PreSave(deviceId, "", "-1");
                 }
                 return;
             }
@@ -126,10 +129,53 @@ namespace calcevent.progress
             {
                 (transport.CurrentState as IUnloaderState).OnUnload();
                 if (transport.CurrentState.GetCurrentState() != oldState)
-                {                    
-                    transport.PreSave(deviceId, checkZone["excavatorId"], checkZone["zoneId"]);
+                {
+                    string excv = (!checkZone.ContainsKey("excavatorId")) ? "-1" : checkZone["excavatorId"];
+                    transport.PreSave(deviceId, excv, checkZone["zoneId"]);
                     transport.CurrentOreType = "0";
                 }
+            }
+        }
+        void CalcExcv(TransportItem transport, Device d = Device.Tracker, string statuscode = "NN")
+        {
+            GeoCoordinate location = transport.CurrentLocation;
+            string deviceId = transport.TransportId;
+            
+            string oldState = transport.CurrentState.GetCurrentState();
+            if (location == null)
+                return;
+
+            string truckid = "-1";
+            string zoneid = transport.ZoneId;
+            int zonetype = _zones[zoneid].Type;
+
+            if (zonetype == 1)
+                foreach(var t in _transports.Where(x => x.TypeId == "1"))
+                    if(_zones.IsIntersect(zoneid, t.CurrentLocation))
+                        truckid = t.TransportId;
+
+            if(truckid != "-1" || (d == Device.Tablet && statuscode == "LL"))
+            {
+                (transport.CurrentState as ITheLoaderState).OnLoad();
+
+                if (transport.CurrentState.GetCurrentState() != oldState)
+                {
+                    transport.PreSave(truckid, deviceId, zoneid);
+                }
+                return;
+            }
+            if (transport.CurrentSpeed == 0)
+            {
+                (transport.CurrentState as IOutagerState).ToStop();
+            }
+            else
+            {
+                (transport.CurrentState as IMoverState).ToMove();
+            }
+
+            if (transport.CurrentState.GetCurrentState() != oldState)
+            {
+                transport.PreSave(truckid, deviceId, zoneid);
             }
         }
     }
@@ -150,6 +196,8 @@ namespace calcevent.progress
     }
     public class ZoneList : List<ZoneItem>
     {
+        public ZoneItem this[string zoneid] { get { return this.Where(x => x.Id == zoneid).FirstOrDefault(); } }
+        
         enum ZoneLocation {zone, target}
         Dictionary<ZoneLocation, double> _zoneradius = new Dictionary<ZoneLocation, double>()
         {
@@ -194,6 +242,10 @@ namespace calcevent.progress
             }
             _result["isIntersect"] = "no";
             return _result;
+        }
+        public bool IsIntersect(string idZone, GeoCoordinate testcoord)
+        {
+            return IsSphereIntersect(idZone, testcoord, ZoneLocation.target);
         }
         bool IsSphereIntersect(string idZone, GeoCoordinate testcoord, ZoneLocation zonelocation)
         {

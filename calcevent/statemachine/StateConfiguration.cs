@@ -109,8 +109,16 @@ namespace calcevent.status
 
         
     }
-    public class ExcavatorInterface : StateInterface
-    {
-
+    public class ExcavatorInterface : StateInterface, ITheLoaderState
+    {        
+        public ExcavatorInterface()
+        {
+            TheLoadRule.AddLoadRules(ref _rules);
+        }
+        public string OnLoad()
+        {
+            _currentState = CurrentState.GetDestinationState(Trigger._L);
+            return GetCurrentState();
+        }
     }
 }

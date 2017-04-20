@@ -49,6 +49,7 @@
     <Compile Include="statemachine\states\ILoaderState.cs" />
     <Compile Include="statemachine\states\IMoverState.cs" />
     <Compile Include="statemachine\states\IOutagerState.cs" />
+    <Compile Include="statemachine\states\ITheLoaderState.cs" />
     <Compile Include="statemachine\states\IUnloaderState.cs" />
     <Compile Include="statemachine\StateConfiguration.cs" />
     <Compile Include="statemachine\TriggerConfigurator.cs" />

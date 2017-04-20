@@ -133,6 +133,7 @@ namespace calcevent
             _tosave["oretypeid"] = oretypeid;
             _tosave["oreweight"] = oreweight.ToString();
             _tosave["timestamp"] = timestamp;
+            _saveit = true;
         }
         string FromFortDevice(string input)
         {

@@ -19,6 +19,8 @@ namespace calcevent.progress
         string _modelid = "";
         string _typeid = "";
 
+        string _zoneid = "";
+
         GeoCoordinate _location;
         string _currenttimestamp = "0";
         string _currentoretype = _DEFAULTORETYPE;
@@ -35,6 +37,7 @@ namespace calcevent.progress
         public string ModelId { get { return _modelid; } set { if (_modelid == "") _modelid = value; } }
         public string TypeId { get { return _typeid; } set { if (_typeid == "") _typeid = value; } }
         public double OreWeight { get { return (_currentoretype == _DEFAULTORETYPE) ? _OREWEIGHTISEMPTY : _currentoreweight; } }
+        public string ZoneId { get { return _zoneid; } set { _zoneid = value; } }
 
         public string CurrentTimeStamp { get { return _currenttimestamp; } set { _currenttimestamp = value; } }
         public string CurrentOreType { get { return _currentoretype; } set { _currentoretype = value; } }
@@ -80,12 +83,12 @@ namespace calcevent.progress
         double _oreweight = _TEMPOREWEIGHT;
         string _timestamp = "";
 
-        public string TruckId { get { return _eventid; } }
+        public string TruckId { get { return _truckid; } }
         public string EventId { get { return _eventid; } }
         public string ZoneId { get { return _zoneid; } }
         public string ExcavatorId { get { return _excavatorid; } }
         public string OreTypeId { get { return _oretypeid; } }
-        public double OreWeight { get { return (_oretypeid == "") ? 0 : _oreweight; } }
+        public double OreWeight { get { return (_oretypeid == "" || _oretypeid == "0") ? 0 : _oreweight; } }
         public string Timestamp { get { return _timestamp; } }
 
         public void Fill(string truckid, string eventid, string zoneid, string excavatorid, string oretypeid, string timestamp)
