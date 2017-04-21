@@ -17,8 +17,10 @@ namespace calcevent
 
         bool _saveit = false;
         Dictionary<string, string> _tosave = new Dictionary<string, string>();
+        Dictionary<string, string> _toupdate = new Dictionary<string, string>();
         public bool SaveIt { get { return GetSaveCheck(); } }
         public Dictionary<string, string> OutputDict { get { return _tosave; } }
+        public Dictionary<string, string> UpdateDict { get { return _toupdate; } }
 
         string pattern_fort = "deviceID:[\"\'][\\w\\d_-]+[\"\'],timestamp:\\d+,statusCode:[\\w\\d_-]+,latitude:\\d+\\.?\\d+,longitude:\\d+\\.?\\d+,speedKPH:\\d+\\.?\\d*,heading:\\d+\\.?\\d*,altitude:\\d+\\.?\\d*";
         //[{                   deviceID:'804',                timestamp:1492172034,statusCode:63646,latitude:43.236474609375,longitude:76.8740234375,speedKPH:1.2,      heading:345.0,      altitude:804.0}]
@@ -39,6 +41,7 @@ namespace calcevent
             string result = string.Empty;
 
             string pattern = string.Format("{0}|{1}|{2}", pattern_tabl, pattern_fort, pattern_fort_old);
+            _toupdate.Clear();
 
             foreach (Match m in Regex.Matches(input, pattern))
             {
@@ -117,7 +120,6 @@ namespace calcevent
             return "{" + _result + "}";
         }
 
-
         bool GetSaveCheck()
         {
             bool _result = _saveit;
@@ -156,8 +158,29 @@ namespace calcevent
             double altitude = double.Parse(a[7].Split(':')[1].Replace('.', ','));
             
             _tm.AddMessage(deviceID, timestamp, statusCode, latitude, longitude, speedKPH, heading, altitude);
+            SetToUpdate(deviceID, timestamp, statusCode);
 
             return GetResult(deviceID);
+        }
+        void SetToUpdate(string deviceID, string timestamp, string statusCode)
+        {
+            TransportItem _ti;
+            string state = string.Empty;
+            try
+            {
+                _ti = _tm[deviceID];
+                state = _ti.CurrentState.GetCurrentState();
+            }
+            catch (ArgumentNullException e)
+            {
+                TXTWriter.Write(string.Format("on deviceId:{0} catch {1}\n", deviceID, e.Message));
+            }
+
+            _toupdate["imei"] = deviceID;
+            _toupdate["timestamp"] = timestamp;
+            _toupdate["statusCode"] = statusCode;
+            _toupdate["newStatusCode"] = Translator.KeyToDBKey[state];
+
         }
         string FromOldFortDevice(string input)
         {

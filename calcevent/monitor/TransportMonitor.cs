@@ -61,6 +61,8 @@ namespace calcevent.progress
 
             if (_ti.TypeId == "1")
                 CalcTruck(_ti, Device.Tablet, statuscode);
+            if (_ti.TypeId == "2")
+                CalcExcv(_ti, Device.Tablet, statuscode);
         }
         public void AddMessage(string deviceId, string timestamp, string statuscode,
             double latitude, double longitude, double speedKPH, double heading, double altitude)
@@ -111,8 +113,9 @@ namespace calcevent.progress
                 if(checkZone["zonelocation"] == "target" || (d == Device.Tablet && statuscode == "LL"))
                 {                    
                     (transport.CurrentState as ILoaderState).OnLoad();
-                    if (transport.CurrentOreType == "0")
-                        transport.CurrentOreType = "5";
+                    //if (transport.CurrentOreType == "0") { }
+                    if (checkZone.ContainsKey("excavatorId"))
+                        transport.CurrentOreType = _transports[checkZone["excavatorId"]].CurrentOreType;
                 }
                 else if (checkZone["zonelocation"] == "zone")
                 {
@@ -157,11 +160,12 @@ namespace calcevent.progress
             if(truckid != "-1" || (d == Device.Tablet && statuscode == "LL"))
             {
                 (transport.CurrentState as ITheLoaderState).OnLoad();
-
+                /*
                 if (transport.CurrentState.GetCurrentState() != oldState)
                 {
                     transport.PreSave(truckid, deviceId, zoneid);
-                }
+                }                
+                */
                 return;
             }
             if (transport.CurrentSpeed == 0)
@@ -172,15 +176,11 @@ namespace calcevent.progress
             {
                 (transport.CurrentState as IMoverState).ToMove();
             }
-
-            if (transport.CurrentState.GetCurrentState() != oldState)
-            {
-                transport.PreSave(truckid, deviceId, zoneid);
-            }
         }
     }
     public class TransportList : List<TransportItem>
     {
+        public TransportItem this[string transportid] { get { return this.Where(x => x.TransportId == transportid).FirstOrDefault(); } }
         public void TransportInit()
         {
             foreach (var item in this)
