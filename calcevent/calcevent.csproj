@@ -46,6 +46,7 @@
     <Compile Include="monitor\ZoneProgress.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="statemachine\atom\BaseState.cs" />
+    <Compile Include="statemachine\atom\StateConfigurationDict.cs" />
     <Compile Include="statemachine\states\ILoaderState.cs" />
     <Compile Include="statemachine\states\IMoverState.cs" />
     <Compile Include="statemachine\states\IOutagerState.cs" />
