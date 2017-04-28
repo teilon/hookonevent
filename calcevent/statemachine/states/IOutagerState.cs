@@ -32,22 +32,22 @@ namespace calcevent.status
             //
             if (!_rule.ContainsKey(State.LO))
                 _rule[State.LO] = new StateConfigurator(State.LO);
-            _rule[State.LO].Permit(Trigger.L_, State.LM);
+            //_rule[State.LO].Permit(Trigger.L_, State.LM);
             _rule[State.LO].Permit(Trigger._M, State.LM);
             //
             if (!_rule.ContainsKey(State.UO))
                 _rule[State.UO] = new StateConfigurator(State.UO);
-            _rule[State.UO].Permit(Trigger.U_, State.UM);
+            //_rule[State.UO].Permit(Trigger.U_, State.UM);
             _rule[State.UO].Permit(Trigger._M, State.UM);
             //
             if (!_rule.ContainsKey(State.PO))
                 _rule[State.PO] = new StateConfigurator(State.PO);
-            _rule[State.PO].Permit(Trigger.P_, State.PM);
+            //_rule[State.PO].Permit(Trigger.P_, State.PM);
             _rule[State.PO].Permit(Trigger._M, State.PM);
             //
             if (!_rule.ContainsKey(State.NO))
                 _rule[State.NO] = new StateConfigurator(State.NO);
-            _rule[State.NO].Permit(Trigger.N_, State.NM);
+            //_rule[State.NO].Permit(Trigger.N_, State.NM);
             _rule[State.NO].Permit(Trigger._M, State.NM);
             //
         }

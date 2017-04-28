@@ -12,6 +12,7 @@ namespace calcevent.progress
         string _id = "";
         string _displayName = "";
         int _type = -1;
+        int _radius = 0;
         List<GeoCoordinate> _points;
 
         string _excavatorid = "";
@@ -19,6 +20,7 @@ namespace calcevent.progress
         public string Id { get { return _id; } set { if (_id == "") _id = value; } }
         public string DisplayName { get { return _displayName; } set { _displayName = value; } }
         public int Type { get { return _type; } set { _type = value; } }
+        public int Radius { get { return _radius; } set { _radius = value; } }
         public List<GeoCoordinate> Points { get { return _points; } }
 
         public string ExcavatorId { get { return _excavatorid; } set { if (_excavatorid == "") _excavatorid = value; } }

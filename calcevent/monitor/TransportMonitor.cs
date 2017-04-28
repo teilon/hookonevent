@@ -90,9 +90,10 @@ namespace calcevent.progress
                 return;
             
             Dictionary<string, string> checkZone = _zones.GetIntersect(location);
+            bool isStoped = transport.CurrentSpeed == 0;
             if (checkZone["isIntersect"] == "no")
             {
-                if (transport.CurrentSpeed == 0)
+                if (isStoped)
                 {
                     (transport.CurrentState as IOutagerState).ToStop();
 
@@ -110,7 +111,7 @@ namespace calcevent.progress
             }
             if(checkZone["type"] == "1")
             {
-                if(checkZone["zonelocation"] == "target" || (d == Device.Tablet && statuscode == "LL"))
+                if((checkZone["zonelocation"] == "target" && isStoped) || (d == Device.Tablet && statuscode == "LL"))
                 {                    
                     (transport.CurrentState as ILoaderState).OnLoad();
                     //if (transport.CurrentOreType == "0") { }
@@ -128,7 +129,7 @@ namespace calcevent.progress
                 }
             }
                 
-            if (checkZone["type"] == "3" || (d == Device.Tablet && statuscode == "UU"))
+            if ((checkZone["type"] == "3" && isStoped) || (d == Device.Tablet && statuscode == "UU"))
             {
                 (transport.CurrentState as IUnloaderState).OnUnload();
                 if (transport.CurrentState.GetCurrentState() != oldState)
